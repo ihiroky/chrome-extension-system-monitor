@@ -1,0 +1,9 @@
+{
+  "name": "com.github.ihiroky.system_monitor",
+  "description": "System Monitor",
+  "path": "COLLECTOR_PATH",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://idcccdapgdfdoknajemcliejfklkbhjf/"
+  ]
+}

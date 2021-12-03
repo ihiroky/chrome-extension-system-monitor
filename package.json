@@ -2,19 +2,20 @@
   "name": "chrome-extension-typescript-starter",
   "version": "1.0.0",
   "description": "chrome-extension-typescript-starter",
-  "main": "index.js",
   "scripts": {
     "watch": "webpack --config webpack/webpack.dev.js --watch",
     "build": "webpack --config webpack/webpack.prod.js",
     "clean": "rimraf dist",
     "test": "npx jest",
-    "style": "prettier --write \"src/**/*.{ts,tsx}\""
+    "style": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "nmh:build": "cd src/go && go build -o ../../dist/ collector.go",
+    "nmh:setup": "bash build/setup_collector.sh"
   },
   "author": "",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chibat/chrome-extension-typescript-starter.git"
+    "url": "https://github.com/ihiroky/chrome-extension-system-monitor"
   },
   "dependencies": {
     "react": "^17.0.1",
