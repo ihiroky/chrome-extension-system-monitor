@@ -1,7 +1,7 @@
 const webpack = require("webpack");
 const path = require("path");
 const CopyPlugin = require("copy-webpack-plugin");
-const srcDir = path.join(__dirname, "..", "src");
+const srcDir = path.join(__dirname, "..", "src", "ts");
 
 module.exports = {
     entry: {

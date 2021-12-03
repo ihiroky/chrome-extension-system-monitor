@@ -8,8 +8,8 @@
     "clean": "rimraf dist",
     "test": "npx jest",
     "style": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "nmh:build": "go build -o dist/ nmh/collector.go",
-    "nmh:setup": "bash nmh/setup_collector.sh"
+    "nmh:build": "go build -o dist/ src/go/collector.go",
+    "nmh:setup": "bash build/setup_collector.sh"
   },
   "author": "",
   "license": "MIT",
