@@ -1,6 +1,23 @@
-function polling() {
-  // console.log("polling");
-  setTimeout(polling, 1000 * 30);
+type Type = 'echo'
+
+type NativeEchoRequest = {
+  type: 'echo'
+  message: string
 }
 
-polling();
+type NativeEchoResponse = NativeEchoRequest
+type NativeResponse = NativeEchoRequest
+
+setInterval((): void => {
+  const request: NativeEchoRequest = {
+    type: 'echo',
+    message: 'Hello.'
+  }
+  chrome.runtime.sendNativeMessage(
+    'com.github.ihiroky.system_monitor',
+    request,
+    (message: NativeResponse): void => {
+      console.log('received:', message)
+    }
+  )
+}, 3000)
