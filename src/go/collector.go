@@ -8,6 +8,8 @@ import (
 	"io"
 	"log"
 	"os"
+
+	"github.com/ihiroky/chrome-extension-system-monitor/cmd"
 )
 
 func writeJSON(writer *bufio.Writer, payload []byte) error {
@@ -48,49 +50,20 @@ type Command interface {
 	Execute() (interface{}, error)
 }
 
-const echoType = "echo"
-
-type Echo struct {
-	Message string
-}
-
-func (e *Echo) Type() string {
-	return echoType
-}
-
-func (e *Echo) Execute() (interface{}, error) {
-	return e.Message, nil
-}
-
 func parseJSON(data []byte) (Command, error) {
 	t := Type{}
 	if err := json.Unmarshal(data, &t); err != nil {
 		return nil, err
 	}
 	switch t.Type {
-	case echoType:
-		var echo Echo
+	case cmd.CommandTypeEcho:
+		var echo cmd.Echo
 		if err := json.Unmarshal(data, &echo); err != nil {
 			return nil, err
 		}
 		return &echo, nil
 	default:
 		return nil, errors.New("Unexpected type: " + t.Type)
-	}
-}
-
-func process(inCh, outCh chan interface{}) {
-	for {
-		msg, ok := <-inCh
-		if !ok {
-			log.Println("inCh is closed.")
-			close(outCh)
-			break
-		}
-
-		// Collect metrics
-
-		outCh <- msg
 	}
 }
 

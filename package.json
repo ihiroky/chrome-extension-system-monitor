@@ -8,7 +8,7 @@
     "clean": "rimraf dist",
     "test": "npx jest",
     "style": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "nmh:build": "go build -o dist/ src/go/collector.go",
+    "nmh:build": "cd src/go && go build -o ../../dist/ collector.go",
     "nmh:setup": "bash build/setup_collector.sh"
   },
   "author": "",
