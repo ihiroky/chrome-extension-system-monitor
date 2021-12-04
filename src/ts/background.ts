@@ -1,23 +1,42 @@
-type Type = 'echo'
+import {
+  OsRequest,
+  CpuRequest,
+  MemoryRequest,
+  DiskRequest,
+  NetworkRequest,
+  MonitorResponse,
+} from './types'
 
-type NativeEchoRequest = {
-  type: 'echo'
-  message: string
-}
-
-type NativeEchoResponse = NativeEchoRequest
-type NativeResponse = NativeEchoRequest
+const port = chrome.runtime.connectNative('com.github.ihiroky.system_monitor')
+port.onMessage.addListener((message: MonitorResponse): void => {
+  console.log('received:', message)
+})
+port.onDisconnect.addListener((port: chrome.runtime.Port): void => {
+  console.log('disconnected:', port)
+})
 
 setInterval((): void => {
-  const request: NativeEchoRequest = {
-    type: 'echo',
-    message: 'Hello.'
+  const osRequest: OsRequest = {
+    type: 'os'
   }
-  chrome.runtime.sendNativeMessage(
-    'com.github.ihiroky.system_monitor',
-    request,
-    (message: NativeResponse): void => {
-      console.log('received:', message)
-    }
-  )
+  port.postMessage(osRequest)
+
+  const cpuRequest: CpuRequest = {
+    type: 'cpu'
+  }
+  port.postMessage(cpuRequest)
+
+  const memoryRequest: MemoryRequest = {
+    type: 'memory'
+  }
+  port.postMessage(memoryRequest)
+
+  const diskRequest: DiskRequest = {
+    type: 'disk'
+  }
+  port.postMessage(diskRequest)
+  const networkRequest: NetworkRequest = {
+    type: 'network'
+  }
+  port.postMessage(networkRequest)
 }, 3000)
