@@ -1,6 +1,6 @@
 # chrome-extension-system-monitor
 
-Chromeブラウザ拡張の Native Messaging を用いてブラウザが動くPCにのメトリクスを収集しグラフに表示します。
+Chromeブラウザ拡張の Native Messaging の動作確認を兼ねてブラウザが動くPCにのメトリクスを収集しグラフに表示します。Native Messaging に関する処理で、ブラウザ拡張部分の処理は `src/ts/background` が、Native messaging host 部分の処理は `src/go/collector.go` に記述されています。
 
 拡張機能のディベロッパーモードで動作確認できます。Native messaging host 部分が Linuxでのみ対応しています。他のOSでは動きません 🥺。その上CPU使用率の値が怪しいです。
 
@@ -8,8 +8,6 @@ Chromeブラウザ拡張の Native Messaging を用いてブラウザが動くPC
 
 ![Screenshot from 2021-12-05 19-39-10](https://user-images.githubusercontent.com/937486/144747394-846f2f23-dc5c-4a2f-a320-cf860b275871.png)
 ![Screenshot from 2021-12-05 19-38-26](https://user-images.githubusercontent.com/937486/144747418-3cd57ec4-943e-4aaa-bbab-c63f74d51a08.png)
-
-Native Messaging に関する処理で、ブラウザ拡張部分の処理は `src/ts/background` が、Native messaging host 部分の処理は `src/go/collector.go` に記述されています。
 
 ## Prerequisites
 
