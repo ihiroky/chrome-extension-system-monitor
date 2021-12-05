@@ -6,7 +6,7 @@ Chromeブラウザ拡張の Native Messaging の動作確認を兼ねてブラ�
 
 拡張機能のディベロッパーモードを用いれば動作確認できます。Native Messaging を動作させるためには対象となる拡張のURLを Naitive messaging host のマニフェストファイルに埋め込む必要がありますが、ディベロッパーモードで拡張を読み込んだときはこのURLに含まれる拡張のIDが拡張のディレクトリ依存となります。このため、必要に応じて `src/com.github.ihiroky.system_monitor.json` に含まれる `allowed_origins` の値を書き換える必要があります。
 
-動作確認環境は Ubuntu 20.04 + Brave Browser 96.1.32.113 ですが、Native messaging host の設定ファイルパスは Chrome に合わせてあります。解説記事は[こちら](https://tech.techtouch.jp/entry/browser-extension-interprocess-communication-using-native-messaging)
+動作確認環境は Ubuntu 20.04 + Brave Browser 96.1.32.113 ですが、Native messaging host の設定ファイルパスは Chrome に合わせてあります。Native Messaging の解説記事は[こちら](https://tech.techtouch.jp/entry/browser-extension-interprocess-communication-using-native-messaging)
 
 ## Prerequisites
 
