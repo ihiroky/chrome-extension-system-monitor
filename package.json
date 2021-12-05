@@ -18,7 +18,9 @@
     "url": "https://github.com/ihiroky/chrome-extension-system-monitor"
   },
   "dependencies": {
+    "chart.js": "^3.0.0",
     "react": "^17.0.1",
+    "react-chartjs-2": "^3.3.0",
     "react-dom": "^17.0.1"
   },
   "devDependencies": {
