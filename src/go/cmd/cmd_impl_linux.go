@@ -31,7 +31,7 @@ type CpuUtilization struct {
 	Clock     uint64 `json:"clock"`
 }
 
-func (c *CpuUtilization) diff(base *CpuUtilization) CpuUtilization {
+func (c CpuUtilization) diff(base CpuUtilization) CpuUtilization {
 	return CpuUtilization{
 		Name:      c.Name,
 		User:      c.User - base.User,
@@ -44,6 +44,27 @@ func (c *CpuUtilization) diff(base *CpuUtilization) CpuUtilization {
 		Steal:     c.Steal - base.Steal,
 		Guest:     c.Guest - base.Guest,
 		GuestNice: c.GuestNice - base.GuestNice,
+		Clock:     c.Clock,
+	}
+}
+
+func (c CpuUtilization) toRate() CpuUtilization {
+	// Expresses an integer to the third decimal place in percentage notation.
+	total := c.User + c.Nice + c.System + c.Idle + c.IoWait + c.Irq + c.Softirq + c.Steal + c.Guest + c.GuestNice
+	const d = 100 * 1000
+	return CpuUtilization{
+		Name:      c.Name,
+		User:      c.User * d / total,
+		Nice:      c.Nice * d / total,
+		System:    c.System * d / total,
+		Idle:      c.Idle * d / total,
+		IoWait:    c.IoWait * d / total,
+		Irq:       c.Irq * d / total,
+		Softirq:   c.Softirq * d / total,
+		Steal:     c.Steal * d / total,
+		Guest:     c.Guest * d / total,
+		GuestNice: c.GuestNice * d / total,
+		Clock:     c.Clock,
 	}
 }
 
@@ -75,7 +96,7 @@ type DiskUtilization struct {
 	IoTicks    uint64 `json:"iotick"`
 }
 
-func (d *DiskUtilization) diff(base *DiskUtilization) DiskUtilization {
+func (d DiskUtilization) diff(base DiskUtilization) DiskUtilization {
 	return DiskUtilization{
 		Name:       d.Name,
 		ReadBytes:  d.ReadBytes - base.ReadBytes,
@@ -97,7 +118,7 @@ type NetworkUtilization struct {
 	Tx   uint64 `json:"tx"`
 }
 
-func (n *NetworkUtilization) diff(base *NetworkUtilization) NetworkUtilization {
+func (n *NetworkUtilization) diff(base NetworkUtilization) NetworkUtilization {
 	return NetworkUtilization{
 		Name: n.Name,
 		Rx:   n.Rx - base.Rx,
@@ -119,6 +140,17 @@ var (
 	lastDiskValue    = map[string]DiskUtilization{}
 	lastNetworkValue = map[string]NetworkUtilization{}
 )
+
+func init() {
+	// Since the value is an accumulated value, read it beforehand
+	// so that the differential value can be returned from the first request.
+	c := Cpu{}
+	c.Execute()
+	d := Disk{}
+	d.Execute()
+	n := Network{}
+	n.Execute()
+}
 
 func parseCpuLine(tag string, values []string) (*CpuUtilization, error) {
 	var nv []uint64
@@ -178,19 +210,13 @@ func parseProcStat(cpuStat *CpuStat) error {
 			if err != nil {
 				return err
 			}
-			last := lastCpuValue[tag]
-			diff := all.diff(&last)
-			lastCpuValue[tag] = *all
-			cpuStat.All = diff
+			cpuStat.All = *all
 		case coreMatcher.Match([]byte(tag)):
 			core, err := parseCpuLine(tag, values)
 			if err != nil {
 				return err
 			}
-			last := lastCpuValue[tag]
-			diff := core.diff(&last)
-			lastCpuValue[tag] = *core
-			cpuStat.Cores = append(cpuStat.Cores, diff)
+			cpuStat.Cores = append(cpuStat.Cores, *core)
 		case tag == "procs_running":
 			r, err := strconv.ParseUint(values[0], 10, 64)
 			if err != nil {
@@ -254,6 +280,19 @@ func (c *Cpu) Execute() (interface{}, error) {
 	if err := parseProcCpuInfo(&cpuStat); err != nil {
 		return nil, err
 	}
+
+	last := lastCpuValue[cpuStat.All.Name]
+	diff := cpuStat.All.diff(last)
+	lastCpuValue[cpuStat.All.Name] = cpuStat.All
+	cpuStat.All = diff.toRate()
+
+	for i, c := range cpuStat.Cores {
+		last := lastCpuValue[c.Name]
+		diff := c.diff(last)
+		lastCpuValue[c.Name] = c
+		cpuStat.Cores[i] = diff.toRate()
+	}
+
 	return cpuStat, nil
 }
 
@@ -327,7 +366,7 @@ func (m *Disk) Execute() (interface{}, error) {
 			return nil, errors.WithStack(err)
 		}
 		last := lastDiskValue[d.Name()]
-		diff := du.diff(&last)
+		diff := du.diff(last)
 		lastDiskValue[d.Name()] = du
 		diskStat.Disks = append(diskStat.Disks, diff)
 	}
@@ -378,7 +417,7 @@ func (m *Network) Execute() (interface{}, error) {
 			return nil, errors.WithStack(err)
 		}
 		last := lastNetworkValue[d.Name()]
-		diff := nu.diff(&last)
+		diff := nu.diff(last)
 		lastNetworkValue[d.Name()] = nu
 		netStat.Networks = append(netStat.Networks, diff)
 	}

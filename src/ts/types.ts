@@ -37,7 +37,11 @@ export type CpuUtilization = {
   system: number
   idle: number
   iowait: number
+  irq: number
+  softirq: number
   steal: number
+  guest: number
+  guest_nice: number
   clock: number
 }
 
@@ -112,3 +116,39 @@ export type MonitorResponse =
   | MemoryResponse
   | DiskResponse
   | NetworkResponse
+
+export type ChartData = {
+  labels: string[]
+  unit?: string
+  stacked?: boolean
+  datasets: {
+    label: string
+    data: number[]
+    order?: number
+    fill?: boolean
+    borderColor?: string
+    tension?: number
+    pointStyle?: string
+  }[]
+}
+
+export const ResourceNames = ['CPU', 'Memory', 'Storage', 'Network'] as const
+
+export type ResourceName = typeof ResourceNames[number]
+
+export interface Resource {
+  readonly name: ResourceName
+
+  kinds(): string[]
+  toData(kind: string): ChartData
+  setKindsChangedListener(listener: (r: Resource) => void): void
+}
+
+export type KindChange = {
+  name: ResourceName,
+  newKinds: string[],
+}
+
+export type KindRequest = {
+  type: 'kind_request'
+}
